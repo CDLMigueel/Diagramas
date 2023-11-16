@@ -1,0 +1,12 @@
+puntaje = 75
+
+if puntaje >= 90:
+    print("Excelente trabajo. Has obtenido una calificación A.")
+elif 80 <= puntaje < 90:
+    print("Buen trabajo. Has obtenido una calificación B.")
+elif 70 <= puntaje < 80:
+    print("Tu calificación es C. Puedes mejorar.")
+elif 60 <= puntaje < 70:
+    print("Tu calificación es D. Considera estudiar más.")
+else:
+    print("Has obtenido una calificación F. Necesitas esforzarte más.")
