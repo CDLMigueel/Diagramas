@@ -1,12 +1,15 @@
-puntaje = 75
+Algoritmo EjemploIf
+    Definir edad Como Entero
 
-if puntaje >= 90:
-    print("Excelente trabajo. Has obtenido una calificación A.")
-elif 80 <= puntaje < 90:
-    print("Buen trabajo. Has obtenido una calificación B.")
-elif 70 <= puntaje < 80:
-    print("Tu calificación es C. Puedes mejorar.")
-elif 60 <= puntaje < 70:
-    print("Tu calificación es D. Considera estudiar más.")
-else:
-    print("Has obtenido una calificación F. Necesitas esforzarte más.")
+    Escribir "Ingrese su edad: "
+    Leer edad
+
+    Si edad >= 18 Entonces
+        Escribir "Eres mayor de edad."
+    FinSi
+
+    // Puedes agregar un bloque 'Sino' para manejar el caso contrario
+    SiNo
+        Escribir "Eres menor de edad."
+    FinSi
+FinAlgoritmo
