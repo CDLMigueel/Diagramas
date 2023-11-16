@@ -1,0 +1,24 @@
+Algoritmo EjemploCase
+    Definir opcion Como Entero
+
+    Escribir "Ingrese una opción (1, 2 o 3): "
+    Leer opcion
+
+    Segun opcion Hacer
+        Caso 1:
+            Escribir "Ha seleccionado la opción 1."
+        FinCaso
+
+        Caso 2:
+            Escribir "Ha seleccionado la opción 2."
+        FinCaso
+
+        Caso 3:
+            Escribir "Ha seleccionado la opción 3."
+        FinCaso
+
+        // Puedes agregar un caso 'De Otro Modo' para manejar opciones no contempladas
+        De Otro Modo:
+            Escribir "Opción no válida. Ingrese 1, 2 o 3."
+    FinSegun
+FinAlgoritmo
