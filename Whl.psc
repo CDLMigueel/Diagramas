@@ -1,15 +1,25 @@
-Algoritmo EjemploWhile
-    Definir numero Como Entero
+import java.util.Scanner;
 
-    // Bucle while para solicitar un número positivo
-    Mientras numero <= 0 Hacer
-        Escribir "Ingrese un número positivo: "
-        Leer numero
-    FinMientras
+public class SumaDigitos {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-    // Imprimir el número ingresado
-    Escribir "Ha ingresado el número: ", numero
-FinAlgoritmo
+        System.out.print("Ingresa un número entero positivo: ");
+        int numero = scanner.nextInt();
+
+        int suma = 0;
+        while (numero > 0) {
+            suma += numero % 10;  // Obtiene el último dígito y lo suma a la variable 'suma'
+            numero /= 10;         // Elimina el último dígito del número
+        }
+
+        System.out.println("La suma de los dígitos es: " + suma);
+
+        scanner.close();
+    }
+}
+
+
 
 
 
