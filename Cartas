@@ -4,183 +4,125 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Blackjack {
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
-        // Crear la baraja
-        List<Card> deck = createDeck();
+        List<String> deck = crearMazo();
         Collections.shuffle(deck);
 
-        // Inicializar manos de jugador y crupier
-        List<Card> playerHand = new ArrayList<>();
-        List<Card> dealerHand = new ArrayList<>();
+        List<String> manoJugador = new ArrayList<>();
+        List<String> manoCrupier = new ArrayList<>();
 
-        // Repartir cartas iniciales
-        dealInitialCards(deck, playerHand, dealerHand);
+        // Repartir las primeras dos cartas a cada jugador
+        repartirCarta(deck, manoJugador);
+        repartirCarta(deck, manoCrupier);
+        repartirCarta(deck, manoJugador);
+        repartirCarta(deck, manoCrupier);
 
-        // Juego principal
-        playGame(scanner, deck, playerHand, dealerHand);
+        mostrarMano("Jugador", manoJugador);
+        mostrarManoParcial("Crupier", manoCrupier);
+
+        // Turno del jugador
+        while (puntuacionMano(manoJugador) < 21) {
+            System.out.print("¿Quieres otra carta? (s/n): ");
+            char respuesta = scanner.next().charAt(0);
+
+            if (respuesta == 's') {
+                repartirCarta(deck, manoJugador);
+                mostrarMano("Jugador", manoJugador);
+            } else {
+                break;
+            }
+        }
+
+        // Turno del crupier
+        while (puntuacionMano(manoCrupier) < 17) {
+            repartirCarta(deck, manoCrupier);
+        }
+
+        mostrarMano("Jugador", manoJugador);
+        mostrarMano("Crupier", manoCrupier);
+
+        // Determinar el ganador
+        determinarGanador(manoJugador, manoCrupier);
 
         scanner.close();
     }
 
-    // Representación de una carta
-    static class Card {
-        String suit;
-        String rank;
-        int value;
+    private static List<String> crearMazo() {
+        List<String> mazo = new ArrayList<>();
+        String[] palos = {"Corazones", "Diamantes", "Treboles", "Picas"};
+        String[] cartas = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
 
-        Card(String suit, String rank, int value) {
-            this.suit = suit;
-            this.rank = rank;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return rank + " of " + suit;
-        }
-    }
-
-    // Crear una baraja de cartas
-    private static List<Card> createDeck() {
-        List<Card> deck = new ArrayList<>();
-        String[] suits = {"Hearts", "Diamonds", "Clubs", "Spades"};
-        String[] ranks = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"};
-
-        for (String suit : suits) {
-            for (int i = 0; i < ranks.length; i++) {
-                int value = (i < 9) ? i + 2 : 10; // Asignar valores a las cartas numéricas y figuras
-                deck.add(new Card(suit, ranks[i], value));
+        for (String palo : palos) {
+            for (String carta : cartas) {
+                mazo.add(carta + " de " + palo);
             }
         }
 
-        return deck;
+        return mazo;
     }
 
-    // Repartir cartas iniciales
-    private static void dealInitialCards(List<Card> deck, List<Card> playerHand, List<Card> dealerHand) {
-        for (int i = 0; i < 2; i++) {
-            playerHand.add(deck.remove(0));
-            dealerHand.add(deck.remove(0));
+    private static void repartirCarta(List<String> mazo, List<String> mano) {
+        String carta = mazo.remove(0);
+        mano.add(carta);
+    }
+
+    private static int puntuacionMano(List<String> mano) {
+        int puntuacion = 0;
+        int ases = 0;
+
+        for (String carta : mano) {
+            char valor = carta.charAt(0);
+            if (valor == 'A') {
+                puntuacion += 11;
+                ases++;
+            } else if (valor == 'K' || valor == 'Q' || valor == 'J') {
+                puntuacion += 10;
+            } else {
+                puntuacion += Character.getNumericValue(valor);
+            }
         }
 
-        System.out.println("Tu mano: " + playerHand);
-        System.out.println("Carta visible del crupier: " + dealerHand.get(0));
-    }
-
-    // Juego principal
-    private static void playGame(Scanner scanner, List<Card> deck, List<Card> playerHand, List<Card> dealerHand) {
-        while (true) {
-            // Verificar si algún jugador tiene 21
-            if (getHandValue(playerHand) == 21) {
-                System.out.println("¡Blackjack! ¡Ganaste!");
-                break;
-            } else if (getHandValue(dealerHand) == 21) {
-                System.out.println("¡El crupier tiene Blackjack! ¡Perdiste!");
-                break;
-            }
-
-            // Turno del jugador
-            playerTurn(scanner, deck, playerHand, dealerHand);
-
-            // Verificar si el jugador se pasa de 21
-            if (getHandValue(playerHand) > 21) {
-                System.out.println("Te has pasado de 21. ¡Perdiste!");
-                break;
-            }
-
-            // Turno del crupier
-            dealerTurn(deck, dealerHand);
-
-            // Verificar resultados
-            determineWinner(playerHand, dealerHand);
-
-            // Preguntar al jugador si quiere jugar otra mano
-            System.out.println("¿Quieres jugar otra mano? (s/n)");
-            String response = scanner.nextLine().toLowerCase();
-
-            if (!response.equals("s")) {
-                break;
-            }
-
-            // Preparar para una nueva mano
-            resetHands(deck, playerHand, dealerHand);
-        }
-    }
-
-    // Turno del jugador
-    private static void playerTurn(Scanner scanner, List<Card> deck, List<Card> playerHand, List<Card> dealerHand) {
-        System.out.println("¿Qué deseas hacer? (Pedir/Cerrar)");
-        String action = scanner.nextLine().toLowerCase();
-
-        while (action.equals("pedir")) {
-            playerHand.add(deck.remove(0));
-            System.out.println("Tu mano: " + playerHand);
-
-            if (getHandValue(playerHand) >= 21) {
-                break;
-            }
-
-            System.out.println("¿Qué deseas hacer? (Pedir/Cerrar)");
-            action = scanner.nextLine().toLowerCase();
-        }
-    }
-
-    // Turno del crupier
-    private static void dealerTurn(List<Card> deck, List<Card> dealerHand) {
-        while (getHandValue(dealerHand) < 17) {
-            dealerHand.add(deck.remove(0));
+        // Ajustar la puntuación si hay ases y la puntuación supera 21
+        while (puntuacion > 21 && ases > 0) {
+            puntuacion -= 10;
+            ases--;
         }
 
-        System.out.println("Mano del crupier: " + dealerHand);
+        return puntuacion;
     }
 
-    // Determinar al ganador
-    private static void determineWinner(List<Card> playerHand, List<Card> dealerHand) {
-        int playerValue = getHandValue(playerHand);
-        int dealerValue = getHandValue(dealerHand);
+    private static void mostrarMano(String jugador, List<String> mano) {
+        System.out.println(jugador + " tiene las siguientes cartas:");
+        for (String carta : mano) {
+            System.out.println("  " + carta);
+        }
+        System.out.println("Puntuación total: " + puntuacionMano(mano) + "\n");
+    }
 
-        System.out.println("Tu mano: " + playerHand + " (Valor: " + playerValue + ")");
-        System.out.println("Mano del crupier: " + dealerHand + " (Valor: " + dealerValue + ")");
+    private static void mostrarManoParcial(String jugador, List<String> mano) {
+        System.out.println(jugador + " tiene una carta boca arriba:");
+        System.out.println("  " + mano.get(0) + "\n");
+    }
 
-        if (playerValue > 21 || (dealerValue <= 21 && dealerValue >= playerValue)) {
-            System.out.println("¡Perdiste!");
+    private static void determinarGanador(List<String> manoJugador, List<String> manoCrupier) {
+        int puntuacionJugador = puntuacionMano(manoJugador);
+        int puntuacionCrupier = puntuacionMano(manoCrupier);
+
+        System.out.println("Resultados:");
+
+        if (puntuacionJugador > 21) {
+            System.out.println("¡El jugador ha perdido! Puntuación del jugador: " + puntuacionJugador);
+        } else if (puntuacionCrupier > 21) {
+            System.out.println("¡El jugador ha ganado! Puntuación del crupier: " + puntuacionCrupier);
+        } else if (puntuacionJugador > puntuacionCrupier) {
+            System.out.println("¡El jugador ha ganado! Puntuación del jugador: " + puntuacionJugador
+                    + ", Puntuación del crupier: " + puntuacionCrupier);
+        } else if (puntuacionCrupier > puntuacionJugador) {
+            System.out.println("¡El crupier ha ganado! Puntuación del crupier: " + puntuacionCrupier
+                    + ", Puntuación del jugador: " + puntuacionJugador);
         } else {
-            System.out.println("¡Ganaste!");
+            System.out.println("¡Es un empate!");
         }
-    }
-
-    // Calcular el valor de una mano de cartas
-    private static int getHandValue(List<Card> hand) {
-        int value = 0;
-        int numAces = 0;
-
-        for (Card card : hand) {
-            value += card.value;
-
-            if (card.rank.equals("Ace")) {
-                numAces++;
-            }
-        }
-
-        // Manejar los Ases (pueden valer 1 u 11)
-        while (numAces > 0 && value > 21) {
-            value -= 10;
-            numAces--;
-        }
-
-        return value;
-    }
-
-    // Preparar para una nueva mano
-    private static void resetHands(List<Card> deck, List<Card> playerHand, List<Card> dealerHand) {
-        playerHand.clear();
-        dealerHand.clear();
-        Collections.shuffle(deck);
-
-        // Repartir cartas iniciales para la nueva mano
-        dealInitialCards(deck, playerHand, dealerHand);
     }
 }
