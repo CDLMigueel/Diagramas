@@ -1,38 +1,61 @@
 import java.util.Random;
 import java.util.Scanner;
 
-public class SimuladorDadosInteractivo {
-
+public class JuegoDados {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Random random = new Random();
 
-        // Bucle para permitir múltiples lanzamientos
-        while (true) {
-            System.out.println("Presiona Enter para lanzar los dados o escribe 'salir' para terminar.");
-            String input = scanner.nextLine();
+        System.out.println("¡Bienvenido al juego de dados!");
+        System.out.print("Presiona Enter para lanzar los dados...");
+        scanner.nextLine();
 
-            if (input.equalsIgnoreCase("salir")) {
-                System.out.println("¡Hasta luego!");
-                break; // Salir del bucle si el usuario escribe "salir"
+        // Lanzamiento inicial de dados
+        int dado1 = lanzarDado();
+        int dado2 = lanzarDado();
+        int sumaDados = dado1 + dado2;
+
+        System.out.println("Resultado del primer lanzamiento: " + dado1 + " + " + dado2 + " = " + sumaDados);
+
+        // Verificar el resultado del primer lanzamiento
+        if (sumaDados == 7 || sumaDados == 11) {
+            System.out.println("¡Felicidades! Has ganado en el primer lanzamiento.");
+        } else if (sumaDados == 2 || sumaDados == 3 || sumaDados == 12) {
+            System.out.println("Lo siento, has perdido en el primer lanzamiento.");
+        } else {
+            // El juego continúa con lanzamientos adicionales
+            System.out.println("El juego continúa. Debes obtener la misma suma para ganar o un 7 para perder.");
+
+            boolean juegoTerminado = false;
+
+            while (!juegoTerminado) {
+                System.out.print("Presiona Enter para lanzar los dados nuevamente...");
+                scanner.nextLine();
+
+                dado1 = lanzarDado();
+                dado2 = lanzarDado();
+                sumaDados = dado1 + dado2;
+
+                System.out.println("Resultado del lanzamiento: " + dado1 + " + " + dado2 + " = " + sumaDados);
+
+                if (sumaDados == 7) {
+                    System.out.println("¡Lo siento, has perdido!");
+                    juegoTerminado = true;
+                } else if (sumaDados == sumaDados) {
+                    System.out.println("¡Felicidades! Has ganado al obtener la misma suma.");
+                    juegoTerminado = true;
+                }
             }
-
-            // Simular el lanzamiento de dos dados
-            int dado1 = lanzarDado(random);
-            int dado2 = lanzarDado(random);
-
-            // Mostrar los resultados
-            System.out.println("Resultado del dado 1: " + dado1);
-            System.out.println("Resultado del dado 2: " + dado2);
-            System.out.println("Suma de los resultados: " + (dado1 + dado2));
         }
 
         scanner.close();
     }
 
-    // Método para simular el lanzamiento de un dado
-    private static int lanzarDado(Random random) {
-        return random.nextInt(6) + 1; // Generar un número aleatorio entre 1 y 6
+    // Función para simular el lanzamiento de un dado (genera un número aleatorio del 1 al 6)
+    private static int lanzarDado() {
+        Random random = new Random();
+        return random.nextInt(6) + 1;
     }
 }
+
 
